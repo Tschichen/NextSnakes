@@ -3,8 +3,6 @@ COUNTBIN, COUNTENV = env_bin_from_config2(SAMPLES,config,'COUNTING')
 #wildcard_constraints:
 #    feat="!os.sep()"
 
-log.warning('KEYS: '+str(list(config['COUNTING']['FEATURES'].keys())))
-
 rule all:
     input:  #expand("COUNTS/Features_{feat}s", feat=config['COUNTING']['FEATURES'].keys()),
             #expand("COUNTS/Features_{feat}s_unique", feat=config['COUNTING']['FEATURES'].keys()),
@@ -53,6 +51,7 @@ rule count_unique_mappers:
     conda:  "snakes/envs/samtools.yaml"
     threads: MAXTHREAD
     shell:  "export LC_ALL=C; arr=({input.u}); alen=${{#arr[@]}}; for i in \"${{!arr[@]}}\";do samtools view -F 260 ${{arr[$i]}} | cut -d$'\t' -f1|sort --parallel={threads} -S 25% -T SORTTMP -u |wc -l > {output.u} ;done 2>> {log}"
+
 
 rule featurecount:
     input:  s = "SORTED_MAPPED/{file}_mapped_sorted.bam",
